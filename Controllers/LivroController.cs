@@ -1,5 +1,6 @@
 using Biblioteca.Context;
 using Biblioteca.Entities;
+using Biblioteca.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,44 +9,68 @@ namespace Biblioteca.Controllers;
 [Route("[controller]")]
 public class LivroController : ControllerBase
 {
-    private readonly ApplicationDbContext _context;
+    private readonly ILivroRepository _repository;
 
-    public LivroController(ApplicationDbContext context)
+    public LivroController(ILivroRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
 
     [HttpGet()]
-    public async Task<ActionResult<IEnumerable<Livro>>> ObterTodos() =>
-        Ok(await _context.Livros.Select(livro => new {
+    public async Task<ActionResult<IEnumerable<Livro>>> ObterTodos()
+    {
+        var livro = await _repository.GetAll();
+
+        return Ok(livro.Select(livro => new
+        {
             livro.Id,
             livro.Nome,
             livro.NumeroDePaginas,
             livro.Disponivel,
             livro.DataPublicacao,
-            autor = new {
+            autor = new
+            {
                 livro.Autor.Id,
                 livro.Autor.NomeCompleto,
                 livro.Autor.Idade,
                 livro.Autor.Nacionalidade
             }
-        }).ToListAsync());
+        }));
+    }
 
+    [HttpGet("{id}")]
+    public async Task<ActionResult<IEnumerable<Livro>>> ObterPorId(int id)
+    {
+        var livro = await _repository.GetById(id);
+
+        if (livro == null)
+            return BadRequest($"Livro de ID {id} não foi encontrado.");
+
+        return Ok(new
+        {
+            livro.Id,
+            livro.Nome,
+            livro.NumeroDePaginas,
+            livro.Disponivel,
+            livro.DataPublicacao,
+            autor = new
+            {
+                livro.Autor.Id,
+                livro.Autor.NomeCompleto,
+                livro.Autor.Idade,
+                livro.Autor.Nacionalidade
+            }
+        });
+    }
     [HttpPost("novo-livro")]
-    public async Task<ActionResult<Livro>> NovoLivro([FromBody]Livro model)
+    public async Task<ActionResult<Livro>> NovoLivro([FromBody] Livro model)
     {
         try
         {
             if (model == null)
                 return BadRequest("Dados inseridos inválidos.");
 
-            var novoLivro = new Livro {
-                Nome = model.Nome,
-                NumeroDePaginas = model.NumeroDePaginas,
-                Disponivel = model.Disponivel,
-                DataPublicacao = model.DataPublicacao,
-                AutorId = model.AutorId
-            };
+            var novoLivro = await _repository.Add(model);
 
             if (novoLivro == null)
                 return BadRequest("Novo livro inválido.");
@@ -55,9 +80,6 @@ public class LivroController : ControllerBase
 
             if (novoLivro.NumeroDePaginas == 0)
                 return BadRequest("O número de páginas tem que ser maior do que 0.");
-            
-            _context.Livros.Add(novoLivro);
-            await _context.SaveChangesAsync();
 
             return Ok(model);
         }
@@ -75,7 +97,7 @@ public class LivroController : ControllerBase
             if (model == null)
                 return BadRequest("Dados inseridos inválidos.");
 
-            var livro = await _context.Livros.FindAsync(id);
+            var livro = await _repository.GetById(id);
 
             if (livro == null)
                 return BadRequest($"Livro de ID {id} não existe.");
@@ -86,10 +108,9 @@ public class LivroController : ControllerBase
             livro.DataPublicacao = model.DataPublicacao;
             livro.AutorId = model.AutorId;
 
-            _context.Livros.Update(livro);
-            await _context.SaveChangesAsync();
+            await _repository.Update(livro);
 
-            return Ok(model);
+            return Ok(livro);
         }
         catch (Exception)
         {
@@ -102,23 +123,18 @@ public class LivroController : ControllerBase
     {
         try
         {
-            var livro = await _context.Livros.FirstOrDefaultAsync(e => e.Id == id);
-            var emprestimo = await _context.Emprestimos.Include(e => e.Livro).FirstOrDefaultAsync(e=> e.LivroId == id);
+            var livro = await _repository.GetById(id);
 
             if (livro == null)
                 return BadRequest($"Livro de ID {id} não existe.");
 
-            if (livro.Disponivel == false)
-                return BadRequest($"Não foi possível excluir esse livro porque ele está emprestado para {emprestimo.Id}: {emprestimo.NomeCompleto}.");
-
-            _context.Livros.Remove(livro);
-            await _context.SaveChangesAsync();
+            await _repository.Delete(livro);
 
             return NoContent();
         }
         catch (Exception)
         {
-            
+
             throw;
         }
     }

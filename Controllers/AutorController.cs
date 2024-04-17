@@ -1,35 +1,39 @@
-using Biblioteca.Context;
 using Biblioteca.Entities;
+using Biblioteca.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Biblioteca.Controllers;
 [ApiController]
 [Route("[controller]")]
 public class AutorController : ControllerBase
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IAutorRepository _repository;
 
-    public AutorController(ApplicationDbContext context)
+    public AutorController(IAutorRepository repository)
     {
-        _context = context;   
+        _repository = repository;
     }
 
     [HttpGet()]
-    public async Task<ActionResult<IEnumerable<Autor>>> ObterTodos() => 
-        Ok(await _context.Autores.Select(autor => new {
-        autor.Id,
-        autor.NomeCompleto,
-        autor.Idade,
-        autor.Nacionalidade,
-        Livros = autor.Livros.Select(livro => new {
-            livro.Id,
-            livro.Nome,
-            livro.NumeroDePaginas,
-            livro.Disponivel,
-            livro.DataPublicacao
-        })
-    }).ToListAsync());
+    public async Task<ActionResult<IEnumerable<Autor>>> ObterTodos()
+    {
+        var getAll = await _repository.GetAll();
+        return Ok(getAll.Select(autor => new
+        {
+            autor.Id,
+            autor.NomeCompleto,
+            autor.Idade,
+            autor.Nacionalidade,
+            Livros = autor.Livros.Select(livro => new
+            {
+                livro.Id,
+                livro.Nome,
+                livro.NumeroDePaginas,
+                livro.Disponivel,
+                livro.DataPublicacao
+            })
+        }));
+    }
 
     [HttpPost("novo-autor")]
     public async Task<ActionResult<Autor>> NovoAutor([FromBody] Autor model)
@@ -39,11 +43,7 @@ public class AutorController : ControllerBase
             if (model == null)
                 return BadRequest("Dados inseridos inválidos.");
 
-            var novoAutor = new Autor {
-                NomeCompleto = model.NomeCompleto,
-                Idade = model.Idade,
-                Nacionalidade = model.Nacionalidade
-            };
+            var novoAutor = await _repository.Add(model);
 
             if (string.IsNullOrEmpty(novoAutor.NomeCompleto))
                 return BadRequest("Insira um nome válido.");
@@ -56,9 +56,6 @@ public class AutorController : ControllerBase
 
             if (novoAutor == null)
                 return BadRequest("Novo autor inválido.");
-
-            _context.Autores.Add(novoAutor);
-            await _context.SaveChangesAsync();
 
             return Ok(model);
         }
@@ -76,18 +73,16 @@ public class AutorController : ControllerBase
             if (model == null)
                 return BadRequest("Dados inseridos inválidos.");
 
-            var autor = await _context.Autores.FindAsync(id);
+            var autor = await _repository.GetById(id);
 
             if (autor == null)
                 return BadRequest($"Autor de ID {id} não existe.");
-            
+
             autor.NomeCompleto = model.NomeCompleto;
             autor.Idade = model.Idade;
             autor.Nacionalidade = model.Nacionalidade;
 
-            _context.Autores.Update(autor);
-            await _context.SaveChangesAsync();
-
+            await _repository.Update(autor);
             return Ok(model);
         }
         catch (Exception)
@@ -100,7 +95,7 @@ public class AutorController : ControllerBase
     {
         try
         {
-            var autor = await _context.Autores.Include(e=> e.Livros).FirstOrDefaultAsync(e => e.Id == id);
+            var autor = await _repository.GetById(id);
 
             if (autor == null)
                 return BadRequest($"Autor de ID {id} não existe.");
@@ -108,14 +103,11 @@ public class AutorController : ControllerBase
             if (autor.Livros.Any())
                 return BadRequest("Não foi possível excluir esse autor porque há livros atrelados a ele.");
 
-            _context.Autores.Remove(autor);
-            await _context.SaveChangesAsync();
-
+            await _repository.Delete(autor);
             return NoContent();
         }
         catch (Exception)
         {
-            
             throw;
         }
     }

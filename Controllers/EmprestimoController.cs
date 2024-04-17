@@ -1,5 +1,6 @@
 using Biblioteca.Context;
 using Biblioteca.Entities;
+using Biblioteca.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,10 +10,12 @@ namespace Biblioteca.Controllers;
 public class EmprestimoController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+    private readonly EmprestimoService _emprestimoService;
 
-    public EmprestimoController(ApplicationDbContext context)
+    public EmprestimoController(ApplicationDbContext context, EmprestimoService emprestimoService)
     {
         _context = context;
+        _emprestimoService = emprestimoService;
     }
 
     [HttpGet()]
@@ -75,7 +78,7 @@ public class EmprestimoController : ControllerBase
             if (string.IsNullOrEmpty(novoEmprestimo.Numero))
                 return BadRequest("Insira um Numero válido.");
 
-            if (!await VerificarDisponibilidadeLivro(model.LivroId))
+            if (!await _emprestimoService.VerificarDisponibilidadeLivro(model.LivroId))
             {
                 var livro = await _context.Livros.FindAsync(model.LivroId);
 
@@ -150,22 +153,6 @@ public class EmprestimoController : ControllerBase
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-        catch (Exception)
-        {
-            throw;
-        }
-    }
-
-    private async Task<bool> VerificarDisponibilidadeLivro(int id)
-    {
-        try
-        {
-            var livros = await _context.Livros.FirstOrDefaultAsync(e => e.Id == id);
-            if (livros != null && livros.Disponivel == false)
-                return true;
-
-            return false;
         }
         catch (Exception)
         {

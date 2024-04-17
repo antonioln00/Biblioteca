@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "480Qtm5XEHvXCPa5R/3wByXiuQK+hGirRMJA8CYqEuDS66TA02WiYrnWztUVATVBNmBnGrtkWWNb7J+oc6/b+A==",
+  "dgSpecHash": "4/WQhS+IypzsEe7L+XvwO5qkVXIXN5jV/IORp+Cmh3GW8cVo/sWwL+JKd15M9/ey8pMNzLGZAHUXndIdQPFtuQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Moura\\Desktop\\DotNet\\Biblioteca\\Biblioteca.csproj",
+  "projectFilePath": "C:\\Users\\Moura\\Desktop\\DotNet\\GitHub\\Biblioteca\\Biblioteca.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Moura\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\Moura\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",

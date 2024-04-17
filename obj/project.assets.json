@@ -4439,11 +4439,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Moura\\Desktop\\DotNet\\Biblioteca\\Biblioteca.csproj",
+      "projectUniqueName": "C:\\Users\\Moura\\Desktop\\DotNet\\GitHub\\Biblioteca\\Biblioteca.csproj",
       "projectName": "Biblioteca",
-      "projectPath": "C:\\Users\\Moura\\Desktop\\DotNet\\Biblioteca\\Biblioteca.csproj",
+      "projectPath": "C:\\Users\\Moura\\Desktop\\DotNet\\GitHub\\Biblioteca\\Biblioteca.csproj",
       "packagesPath": "C:\\Users\\Moura\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Moura\\Desktop\\DotNet\\Biblioteca\\obj\\",
+      "outputPath": "C:\\Users\\Moura\\Desktop\\DotNet\\GitHub\\Biblioteca\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Moura\\AppData\\Roaming\\NuGet\\NuGet.Config"

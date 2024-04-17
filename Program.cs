@@ -1,16 +1,25 @@
 using System.Text.Json.Serialization;
 using Biblioteca.Context;
+using Biblioteca.Entities;
+using Biblioteca.Interfaces;
+using Biblioteca.Repositories;
+using Biblioteca.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
-builder.Services.AddControllers().AddJsonOptions(e => 
-    e.JsonSerializerOptions.ReferenceHandler=ReferenceHandler.IgnoreCycles);
+builder.Services.AddControllers().AddJsonOptions(e =>
+    e.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<ApplicationDbContext>(e => 
+builder.Services.AddDbContext<ApplicationDbContext>(e =>
     e.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<EmprestimoService>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<DbContext, ApplicationDbContext>();
+builder.Services.AddScoped<IAutorRepository, AutorRepository>();
 
 var app = builder.Build();
 

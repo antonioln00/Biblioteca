@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 using Biblioteca.Context;
-using Biblioteca.Entities;
 using Biblioteca.Interfaces;
 using Biblioteca.Repositories;
 using Biblioteca.Services;
@@ -20,6 +19,7 @@ builder.Services.AddScoped<EmprestimoService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<DbContext, ApplicationDbContext>();
 builder.Services.AddScoped<IAutorRepository, AutorRepository>();
+builder.Services.AddScoped<IEmprestimoRepository, EmprestimoRepository>();
 
 var app = builder.Build();
 

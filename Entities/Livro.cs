@@ -1,7 +1,6 @@
 namespace Biblioteca.Entities;
-public class Livro
+public class Livro : Base<int>
 {
-    public int Id { get; set; }
     public string Nome { get; set; }
     public int NumeroDePaginas { get; set; }
     public bool Disponivel { get; set; }

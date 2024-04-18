@@ -138,7 +138,6 @@ public class LivroController : ControllerBase
         }
         catch (Exception)
         {
-
             throw;
         }
     }

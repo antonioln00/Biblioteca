@@ -1,5 +1,5 @@
-using Biblioteca.Context;
 using Biblioteca.Entities;
+using Biblioteca.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,33 +8,67 @@ namespace Biblioteca.Controllers;
 [Route("[controller]")]
 public class SinopseController : ControllerBase
 {
-    private readonly ApplicationDbContext _context;
+    private readonly ISinopseRepository _sinopseRepository;
 
-    public SinopseController(ApplicationDbContext context)
+    public SinopseController(ISinopseRepository sinopseRepository)
     {
-        _context = context;
+        _sinopseRepository = sinopseRepository;
     }
 
     [HttpGet()]
-    public async Task<ActionResult<IEnumerable<Sinopse>>> ObterTodos() => 
-        Ok (await _context.Sinopses.Select(sinopse => new {
+    public async Task<ActionResult<IEnumerable<Sinopse>>> ObterTodos()
+    {
+        var sinopse = await _sinopseRepository.GetAll();
+        
+        return Ok(sinopse.Select(sinopse => new
+        {
             sinopse.Id,
             sinopse.Genero,
             sinopse.Resenha,
-            livro = new {
+            livro = new
+            {
                 sinopse.Livro.Id,
                 sinopse.Livro.Nome,
                 sinopse.Livro.NumeroDePaginas,
                 sinopse.Livro.Disponivel,
                 sinopse.Livro.DataPublicacao,
-                autor = new {
-                   sinopse.Livro.Autor.Id,
-                   sinopse.Livro.Autor.NomeCompleto,
-                   sinopse.Livro.Autor.Idade,
-                   sinopse.Livro.Autor.Nacionalidade 
+                autor = new
+                {
+                    sinopse.Livro.Autor.Id,
+                    sinopse.Livro.Autor.NomeCompleto,
+                    sinopse.Livro.Autor.Idade,
+                    sinopse.Livro.Autor.Nacionalidade
                 }
             }
-        }).ToListAsync());
+        }));
+    }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<IEnumerable<Sinopse>>> ObterPorId(int id)
+    {
+        var sinopse = await _sinopseRepository.GetById(id);
+        return Ok(new
+        {
+            sinopse.Id,
+            sinopse.Genero,
+            sinopse.Resenha,
+            livro = new
+            {
+                sinopse.Livro.Id,
+                sinopse.Livro.Nome,
+                sinopse.Livro.NumeroDePaginas,
+                sinopse.Livro.Disponivel,
+                sinopse.Livro.DataPublicacao,
+                autor = new
+                {
+                    sinopse.Livro.Autor.Id,
+                    sinopse.Livro.Autor.NomeCompleto,
+                    sinopse.Livro.Autor.Idade,
+                    sinopse.Livro.Autor.Nacionalidade
+                }
+            }
+        });
+    }
 
     [HttpPost("nova-sinopse")]
     public async Task<ActionResult<Sinopse>> NovaSinopse([FromBody] Sinopse model)
@@ -44,11 +78,7 @@ public class SinopseController : ControllerBase
             if (model == null)
                 return BadRequest("Dados inseridos inválidos.");
 
-            var novaSinopse = new Sinopse {
-                Genero = model.Genero,
-                Resenha = model.Resenha,
-                LivroId = model.LivroId
-            };
+            var novaSinopse = await _sinopseRepository.Add(model);
 
             if (novaSinopse == null)
                 return BadRequest("Nova sinopse inválida.");
@@ -59,10 +89,7 @@ public class SinopseController : ControllerBase
             if (string.IsNullOrEmpty(novaSinopse.Resenha))
                 return BadRequest("Insira uma resenha válido.");
 
-            _context.Sinopses.Add(novaSinopse);
-            await _context.SaveChangesAsync();
-
-            return Ok(model);
+            return Ok(novaSinopse);
         }
         catch (Exception)
         {
@@ -78,19 +105,18 @@ public class SinopseController : ControllerBase
             if (model == null)
                 return BadRequest("Dados inseridos inválidos.");
 
-            var sinopse = await _context.Sinopses.FindAsync(id);
+            var sinopse = await _sinopseRepository.GetById(id);
 
             if (sinopse == null)
                 return BadRequest($"Sinopse de ID {id} não existe.");
-            
+
             sinopse.Genero = model.Genero;
             sinopse.Resenha = model.Resenha;
             sinopse.LivroId = model.LivroId;
 
-            _context.Sinopses.Update(sinopse);
-            await _context.SaveChangesAsync();
+            await _sinopseRepository.Update(sinopse);
 
-            return Ok(model);
+            return Ok(sinopse);
         }
         catch (Exception)
         {
@@ -103,13 +129,12 @@ public class SinopseController : ControllerBase
     {
         try
         {
-            var sinopse = await _context.Sinopses.FindAsync(id);
+            var sinopse = await _sinopseRepository.GetById(id);
 
             if (sinopse == null)
                 return BadRequest($"Sinopse de ID {id} não existe.");
-            
-            _context.Sinopses.Remove(sinopse);
-            await _context.SaveChangesAsync();
+
+            await _sinopseRepository.Delete(sinopse);
 
             return NoContent();
         }

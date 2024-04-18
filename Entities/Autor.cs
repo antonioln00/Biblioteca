@@ -1,7 +1,6 @@
 namespace Biblioteca.Entities;
-public class Autor
+public class Autor : Base<int>
 {
-    public int Id { get; set; }
     public string NomeCompleto { get; set; }
     public int Idade { get; set; }
     public string Nacionalidade { get; set; }

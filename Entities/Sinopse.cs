@@ -1,7 +1,6 @@
 namespace Biblioteca.Entities;
-public class Sinopse
+public class Sinopse : Base<int>
 {
-    public int Id { get; set; }
     public string Genero { get; set; }
     public string Resenha { get; set; }
     public int LivroId { get; set; }

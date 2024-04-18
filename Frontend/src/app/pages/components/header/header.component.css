@@ -1,0 +1,59 @@
+.app-header {
+  background: linear-gradient(to bottom, #007bff, #6f42c1);
+  /* Fundo gradiente azul para roxo */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app-header .logo {
+  width: 35%;
+  padding: 2rem 3rem;
+}
+
+.app-header .logo img {
+  width: 50%;
+  max-width: 350px;
+  margin-bottom: 2rem;
+}
+
+.navigation {
+  display: flex;
+  justify-content: space-between;
+}
+
+.logo {
+  cursor: pointer;
+  /* Muda o cursor para uma mãozinha */
+}
+
+.app-header .user-info {
+  margin-right: 20px;
+  /* Ajuste conforme necessário */
+}
+
+.logo-img {
+  max-width: 20%;
+}
+
+@media (max-width: 576px) {
+  .app-header .logo {
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-header .logo {
+    width: 30%;
+  }
+
+  .navigation {
+    flex-direction: column;
+    /* Empilha os botões verticalmente */
+  }
+
+  .navigation button {
+    padding-bottom: 15px;
+    /* Espaço visual entre os botões quando a tela for menor que 756px */
+  }
+}

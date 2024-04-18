@@ -18,7 +18,7 @@ public class Repository<T> : IRepository<T> where T : class
         return model;
     }
 
-    public virtual async Task Delete(T model)
+    public async Task Delete(T model)
     {
         _context.Set<T>().Remove(model);
         await _context.SaveChangesAsync();

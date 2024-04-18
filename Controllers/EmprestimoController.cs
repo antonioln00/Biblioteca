@@ -1,5 +1,6 @@
 using Biblioteca.Entities;
 using Biblioteca.Interfaces;
+using Biblioteca.Repositories;
 using Biblioteca.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,19 +9,21 @@ namespace Biblioteca.Controllers;
 [Route("[controller]")]
 public class EmprestimoController : ControllerBase
 {
-    private readonly IEmprestimoRepository _repository;
+    private readonly IEmprestimoRepository _emprestimoRepository;
+    private readonly ILivroRepository _livroRepository;
     private readonly EmprestimoService _emprestimoService;
 
-    public EmprestimoController(IEmprestimoRepository repository, EmprestimoService emprestimoService)
+    public EmprestimoController(IEmprestimoRepository emprestimoRepository, EmprestimoService emprestimoService, ILivroRepository livroRepository)
     {
-        _repository = repository;
+        _emprestimoRepository = emprestimoRepository;
         _emprestimoService = emprestimoService;
+        _livroRepository = livroRepository;
     }
 
     [HttpGet()]
     public async Task<ActionResult<IEnumerable<Emprestimo>>> ObterTodos()
     {
-        var emprestimos = await _repository.GetAll();
+        var emprestimos = await _emprestimoRepository.GetAll();
         return Ok(emprestimos.Select(emprestimo => new
         {
             emprestimo.Id,
@@ -57,7 +60,7 @@ public class EmprestimoController : ControllerBase
             if (model == null)
                 return BadRequest("Dados inseridos inválidos.");
 
-            var novoEmprestimo = await _repository.Add(model);
+            var novoEmprestimo = await _emprestimoRepository.Add(model);
 
             if (novoEmprestimo == null)
                 return BadRequest("Novo empréstimo inválido.");
@@ -76,10 +79,9 @@ public class EmprestimoController : ControllerBase
 
             if (!await _emprestimoService.VerificarDisponibilidadeLivro(model.LivroId))
             {
-                // var livro = await _context.Livros.FindAsync(model.LivroId);
-
-                // livro.Disponivel = false;
-                // _context.Livros.Update(livro);
+                var livro = await _livroRepository.GetById(model.LivroId);
+                livro.Disponivel = false;
+                await _livroRepository.Update(livro);
             }
             else
             {
@@ -102,7 +104,7 @@ public class EmprestimoController : ControllerBase
             if (model == null)
                 return BadRequest("Dados inseridos inválidos.");
 
-            var emprestimo = await _repository.GetById(id);
+            var emprestimo = await _emprestimoRepository.GetById(id);
 
             if (emprestimo == null)
                 return BadRequest($"Empréstimo de ID {id} não existe.");
@@ -115,7 +117,7 @@ public class EmprestimoController : ControllerBase
             emprestimo.DataNascimento = model.DataNascimento;
             emprestimo.LivroId = model.LivroId;
 
-            await _repository.Update(emprestimo);
+            await _emprestimoRepository.Update(emprestimo);
 
             return Ok(emprestimo);
         }
@@ -130,7 +132,7 @@ public class EmprestimoController : ControllerBase
     {
         try
         {
-            var emprestimo = await _repository.GetById(id);
+            var emprestimo = await _emprestimoRepository.GetById(id);
 
             if (emprestimo == null)
                 return BadRequest($"Emprestimo de ID {id} não existe.");
@@ -140,7 +142,7 @@ public class EmprestimoController : ControllerBase
             // livro.Disponivel = true;
             // _context.Livros.Update(livro);
 
-            await _repository.Delete(emprestimo);
+            await _emprestimoRepository.Delete(emprestimo);
             return NoContent();
         }
         catch (Exception)

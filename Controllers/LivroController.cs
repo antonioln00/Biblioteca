@@ -128,6 +128,10 @@ public class LivroController : ControllerBase
             if (livro == null)
                 return BadRequest($"Livro de ID {id} não existe.");
 
+            if (livro.Disponivel == false)
+                return BadRequest($"Não foi possível excluir esse livro porque ele está emprestado.");
+
+
             await _repository.Delete(livro);
 
             return NoContent();

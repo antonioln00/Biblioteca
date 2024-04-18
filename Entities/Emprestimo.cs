@@ -1,7 +1,6 @@
 namespace Biblioteca.Entities;
-public class Emprestimo
+public class Emprestimo : Base<int>
 {
-    public int Id { get; set; }
     public string NomeCompleto { get; set; }
     public string RG { get; set; }
     public string Endereco { get; set; }

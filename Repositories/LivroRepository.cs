@@ -13,13 +13,4 @@ public class LivroRepository : Repository<Livro>, ILivroRepository
 
     public override async Task<Livro> GetById(int id) =>
         await _context.Livros.Include(e => e.Autor).FirstOrDefaultAsync(e => e.Id == id);
-
-    public override async Task Delete(Livro model)
-    {
-        var emprestimo = await _context.Emprestimos.Include(e => e.Livro).FirstOrDefaultAsync(e => e.LivroId == model.Id);
-
-        if (model.Disponivel == false)
-            new Exception($"Não foi possível excluir esse livro porque ele está emprestado para {emprestimo.Id}: {emprestimo.NomeCompleto}.");
-
-    }
 }

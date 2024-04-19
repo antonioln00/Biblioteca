@@ -1,6 +1,5 @@
 .app-header {
   background: linear-gradient(to bottom, #007bff, #6f42c1);
-  /* Fundo gradiente azul para roxo */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -19,17 +18,22 @@
 
 .navigation {
   display: flex;
-  justify-content: space-between;
+  padding: 100px;
+}
+
+.button-navigation{
+  margin-bottom: 10px;
+  margin-right: 10px;
+  width: 160px;
+  height: 50px;
 }
 
 .logo {
   cursor: pointer;
-  /* Muda o cursor para uma mãozinha */
 }
 
 .app-header .user-info {
   margin-right: 20px;
-  /* Ajuste conforme necessário */
 }
 
 .logo-img {
@@ -44,16 +48,14 @@
 
 @media (max-width: 768px) {
   .app-header .logo {
-    width: 30%;
+    width: 40%;
   }
 
   .navigation {
     flex-direction: column;
-    /* Empilha os botões verticalmente */
   }
 
   .navigation button {
     padding-bottom: 15px;
-    /* Espaço visual entre os botões quando a tela for menor que 756px */
   }
 }

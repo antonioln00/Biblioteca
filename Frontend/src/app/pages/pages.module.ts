@@ -16,6 +16,9 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatTableModule} from '@angular/material/table';
 import {MatPaginatorModule} from '@angular/material/paginator';
+import { LivrosComponent } from './home/home/livros/livros.component';
+import { HttpClientModule } from '@angular/common/http';
+import {HomeRoutingModule} from './home/home/home-routing.module'
 
 @NgModule({
   declarations: [
@@ -23,6 +26,7 @@ import {MatPaginatorModule} from '@angular/material/paginator';
     FooterComponent,
     HomeComponent,
     LoginComponent,
+    LivrosComponent,
   ],
   imports: [
     CommonModule,
@@ -37,7 +41,9 @@ import {MatPaginatorModule} from '@angular/material/paginator';
     BrowserAnimationsModule,
     MatTableModule,
     MatPaginatorModule,
-    MatIconModule
+    MatIconModule,
+    HttpClientModule,
+    HomeRoutingModule
   ],
   exports: [HeaderComponent, FooterComponent, HomeComponent],
 })

@@ -8,7 +8,11 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [BrowserModule, AppRoutingModule, PagesModule],
+  imports: [
+    BrowserModule,
+    PagesModule,
+    AppRoutingModule,
+  ],
   providers: [
     provideAnimationsAsync()
   ],
